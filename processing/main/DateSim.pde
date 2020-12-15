@@ -1,11 +1,14 @@
 
+// Date Simulator
+
 class DateSim {
-  int tickRate = 9999999;
+  int tickRate = 1;
   int day, month, year, hour, minute, second;
+
   DateSim(int d, int m, int y) {
-    this.day = d;
+    this.day   = d;
     this.month = m;
-    this.year = y;
+    this.year  = y;
   }
   void tick() {
     second += tickRate;
@@ -66,6 +69,9 @@ class DateSim {
     return year;
   }
   void print() { 
-    println(nf(this.hour, 2) + ":" + nf(this.minute, 2) + ":" + nf(this.second, 2) + "  " + nf(this.day, 2) + "." + this.month + "/" + this.year);
+    println(this);
+  }
+  String toString() {
+    return nf(this.hour, 2) + ":" + nf(this.minute, 2) + ":" + nf(this.second, 2) + "  " + nf(this.day, 2) + "." + nf(this.month, 2) + "/" + this.year;
   }
 }

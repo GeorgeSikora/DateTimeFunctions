@@ -3,8 +3,8 @@ String[] nazevDne = { "neděle", "pondělí", "úterý", "středa", "čtvrtek", 
 
 DateSim date;
 
-/*
-  timer1 - 1 minute
+/* 
+ timer1 - 1 minute
  timer2 - 10 minutes
  timer3 - 1 hour
  timer4 - 8 hours
@@ -15,25 +15,37 @@ long timer2 = 0;
 long timer3 = 0;
 long timer4 = 0;
 
-byte [] dateNow, dateLast;
+int dateNow, dateLast;
 
+int dateTimeShift;
 byte seasonType = 0; // 1 - summer, 0 - winter
 
 void setup() {
 
-  date = new DateSim(17, 4, 2003);
+  frameRate(999);
 
-  dateNow  = Date(13, 12, 2020);
-  dateLast = Date(day(), month(), year());
+  //int date1  = Date(13, 38, 5, 12, 2020);
+  //printDate(date1);
+  //int date2  = Date(10, 30, 12, 12, 2020);
+  //println(DateHigher(date1, date2));
+
+  date = new DateSim(25, 10, 2020);
+
+  dateNow  = Date(date.day(), date.month(), date.year());
+  dateLast = Date(date.day(), date.month(), date.year());
+
+  getNextTimeShift();
+}
+
+void getNextTimeShift() {
 
   int year = getYear(dateNow);
 
   int summerShiftDay = getLastDayOfWeekInMonth(0, 3, year);
-  byte[] summerShift = Date(summerShiftDay, 3, year); // z 3 na 2 hod
+  int summerShift = Date(3, 0, summerShiftDay, 3, year); // z 3 na 2 hod
 
   int winterShiftDay = getLastDayOfWeekInMonth(0, 10, year);
-  byte[] winterShift = Date(winterShiftDay, 10, year); // z 2 na 3 hod
-
+  int winterShift = Date(2, 0, winterShiftDay, 10, year); // z 2 na 3 hod
 
   if (DateHigher(summerShift, dateNow)) {
     println("Čekáme na letní časík");
@@ -52,11 +64,16 @@ void setup() {
     }
   }
 
+  print("Aktuální čas ");
   printDate(dateNow);
+
+  print("Den posunu ");
   if (seasonType == 0) {
     printDate(summerShift);
+    dateTimeShift = summerShift;
   } else {
     printDate(winterShift);
+    dateTimeShift = winterShift;
   }
 }
 
@@ -70,13 +87,6 @@ void draw() {
       //println("10 minutes");
       if (millis() > timer3) {
 
-        // get RTC date
-        dateNow = Date(day(), month(), year());
-
-        if (!DateEquals(dateNow, dateLast)) {
-          println("Its new day, lets check some things");
-        }
-
         timer3 = millis() + 3600000L;
         //println("1 hour");
         if (millis() > timer4) {
@@ -86,10 +96,31 @@ void draw() {
       }
     }
   }
-  dateLast = dateNow;
 
-  date.print();
   date.tick();
+  date.print();
+
+  // get RTC date
+  dateNow = Date(date.hour(), date.minute(), date.day(), date.month(), date.year());
+
+  //if (!DateEquals(dateNow, dateLast)) {
+
+  //println("Its new day, lets check some things");
+
+  if (DateHigher(dateNow, dateTimeShift)) {
+
+    if (seasonType == 0) {
+      println("Today at 2am we will shift time to 3am !");
+      dateNow
+    } else {
+      println("Today at 3am we will shift time to 2am !");
+    }
+
+    getNextTimeShift();
+  }
+  //}
+
+  dateLast = dateNow;
 }
 
 int getDay(int d, int m, int r) {
